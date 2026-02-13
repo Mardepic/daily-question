@@ -6,8 +6,8 @@
   <title>Reflection Diary</title>
   <style>
     body { font-family: Arial, sans-serif; margin: 2rem; background: #fdf6f0; color: #333; }
-    h1 { color: #6b4226; }
-    input, button { padding: 0.5rem; margin: 0.3rem 0; border-radius: 5px; border: 1px solid #ccc; }
+    h1 { color: #6b4226; text-align: center; }
+    input, button { padding: 0.5rem; margin: 0.3rem 0; border-radius: 5px; border: 1px solid #ccc; width: 100%; box-sizing: border-box; }
     button { cursor: pointer; background: #6b4226; color: #fff; border: none; }
     #notesList { list-style: none; padding-left: 0; margin-top: 1rem; }
     #notesList li { background: #fff1e6; padding: 0.5rem; margin-bottom: 0.5rem; border-radius: 5px; }
@@ -21,8 +21,8 @@
 
   <!-- Login / Registration Section -->
   <div id="loginSection">
-    <input type="email" id="email" placeholder="Sähköposti"><br>
-    <input type="password" id="password" placeholder="Salasana"><br>
+    <input type="email" id="email" placeholder="Sähköposti">
+    <input type="password" id="password" placeholder="Salasana">
     <button id="loginBtn">Kirjaudu sisään</button>
     <button id="registerBtn">Rekisteröidy</button>
     <p id="loginStatus"></p>
@@ -30,7 +30,7 @@
 
   <!-- Diary Section -->
   <div id="diarySection" style="display:none;">
-    <input type="text" id="noteInput" placeholder="Kirjoita muistiinpano"><br>
+    <input type="text" id="noteInput" placeholder="Kirjoita muistiinpano">
     <button id="saveBtn">Tallenna muistiinpano</button>
     <button id="logoutBtn">Kirjaudu ulos</button>
     <ul id="notesList"></ul>
@@ -101,7 +101,6 @@
       await signOut(auth);
     });
 
-    // Seuraa kirjautumistilaa
     onAuthStateChanged(auth, (user) => {
       if(user) {
         currentUser = user;
@@ -139,9 +138,10 @@
       const q = query(collection(db, "users", currentUser.uid, "notes"), orderBy("createdAt"));
       const snapshot = await getDocs(q);
       snapshot.forEach(doc => {
-        const li = document.createElement("li");
         const data = doc.data();
-        li.textContent = `[${data.createdAt.toDateString ? data.createdAt.toDateString() : new Date(data.createdAt.seconds*1000).toLocaleString()}] ${data.text}`;
+        const li = document.createElement("li");
+        const date = data.createdAt.toDateString ? data.createdAt.toDateString() : new Date(data.createdAt.seconds*1000).toLocaleString();
+        li.textContent = `[${date}] ${data.text}`;
         notesList.appendChild(li);
       });
     }
