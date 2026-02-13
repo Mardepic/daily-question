@@ -5,31 +5,255 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Reflection Diary 2026</title>
 <style>
-    body { font-family: sans-serif; padding: 20px; background:#f0f0f0; }
-    #loginContainer, #diaryContainer { max-width: 800px; margin: auto; }
-    .day-card { background:white; margin:10px 0; padding:15px; border-radius:10px; box-shadow:0 2px 5px rgba(0,0,0,0.1);}
-    .day-title { font-weight:bold; margin-bottom:5px;}
-    .question { margin-bottom:10px; font-style:italic;}
-    textarea { width:100%; padding:8px; border-radius:10px; border:1px solid #ccc;}
-    button { padding:8px 15px; border:none; border-radius:5px; margin:5px; cursor:pointer; }
+    * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+    }
+
+    body { 
+        font-family: 'Georgia', serif;
+        background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+        min-height: 100vh;
+        padding: 20px;
+        color: #2c3e50;
+    }
+
+    #loginContainer {
+        max-width: 400px;
+        margin: 100px auto;
+        background: white;
+        padding: 40px;
+        border-radius: 20px;
+        box-shadow: 0 10px 40px rgba(0,0,0,0.1);
+    }
+
+    #loginContainer h2 {
+        text-align: center;
+        margin-bottom: 30px;
+        color: #34495e;
+        font-size: 28px;
+    }
+
+    #loginContainer input {
+        width: 100%;
+        padding: 12px;
+        margin-bottom: 15px;
+        border: 2px solid #e0e0e0;
+        border-radius: 10px;
+        font-size: 16px;
+        transition: border-color 0.3s;
+    }
+
+    #loginContainer input:focus {
+        outline: none;
+        border-color: #3498db;
+    }
+
+    #diaryContainer {
+        max-width: 1200px;
+        margin: 0 auto;
+    }
+
+    .diary-header {
+        text-align: center;
+        margin-bottom: 40px;
+        background: white;
+        padding: 30px;
+        border-radius: 20px;
+        box-shadow: 0 5px 20px rgba(0,0,0,0.08);
+    }
+
+    .diary-header h1 {
+        font-size: 36px;
+        color: #2c3e50;
+        margin-bottom: 10px;
+        font-weight: 400;
+        letter-spacing: 1px;
+    }
+
+    #weekNumber {
+        font-size: 20px;
+        color: #7f8c8d;
+        font-weight: 300;
+    }
+
+    #weekContainer {
+        display: grid;
+        grid-template-columns: 1fr;
+        gap: 20px;
+        margin-bottom: 30px;
+    }
+
+    .day-card {
+        background: white;
+        padding: 30px;
+        border-radius: 15px;
+        box-shadow: 0 5px 15px rgba(0,0,0,0.08);
+        transition: transform 0.2s, box-shadow 0.2s;
+        border-left: 5px solid #3498db;
+    }
+
+    .day-card:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 8px 25px rgba(0,0,0,0.12);
+    }
+
+    .day-card:nth-child(1) { border-left-color: #e74c3c; }
+    .day-card:nth-child(2) { border-left-color: #f39c12; }
+    .day-card:nth-child(3) { border-left-color: #f1c40f; }
+    .day-card:nth-child(4) { border-left-color: #2ecc71; }
+    .day-card:nth-child(5) { border-left-color: #3498db; }
+    .day-card:nth-child(6) { border-left-color: #9b59b6; }
+    .day-card:nth-child(7) { border-left-color: #e91e63; }
+
+    .day-title {
+        font-size: 28px;
+        font-weight: 600;
+        color: #2c3e50;
+        margin-bottom: 20px;
+        padding-bottom: 15px;
+        border-bottom: 2px solid #ecf0f1;
+    }
+
+    .question {
+        font-size: 18px;
+        color: #34495e;
+        margin-bottom: 20px;
+        font-style: italic;
+        line-height: 1.6;
+        padding: 15px;
+        background: #f8f9fa;
+        border-radius: 10px;
+        border-left: 3px solid #3498db;
+    }
+
+    textarea {
+        width: 100%;
+        padding: 15px;
+        border: 2px solid #e0e0e0;
+        border-radius: 10px;
+        font-family: 'Georgia', serif;
+        font-size: 16px;
+        line-height: 1.8;
+        resize: vertical;
+        min-height: 120px;
+        transition: border-color 0.3s;
+    }
+
+    textarea:focus {
+        outline: none;
+        border-color: #3498db;
+        background: #fafbfc;
+    }
+
+    .navigation {
+        display: flex;
+        justify-content: center;
+        gap: 15px;
+        margin-bottom: 20px;
+    }
+
+    button {
+        padding: 12px 25px;
+        border: none;
+        border-radius: 10px;
+        font-size: 16px;
+        cursor: pointer;
+        transition: all 0.3s;
+        font-family: 'Arial', sans-serif;
+        font-weight: 500;
+    }
+
+    button:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+    }
+
+    #loginContainer button {
+        width: 100%;
+        background: #3498db;
+        color: white;
+        margin-top: 10px;
+    }
+
+    #loginContainer button:hover {
+        background: #2980b9;
+    }
+
+    .nav-button {
+        background: #3498db;
+        color: white;
+    }
+
+    .nav-button:hover {
+        background: #2980b9;
+    }
+
+    .nav-button:disabled {
+        background: #95a5a6;
+        cursor: not-allowed;
+        transform: none;
+    }
+
+    .logout-button {
+        background: #e74c3c;
+        color: white;
+    }
+
+    .logout-button:hover {
+        background: #c0392b;
+    }
+
+    @media (max-width: 768px) {
+        .diary-header h1 {
+            font-size: 28px;
+        }
+
+        .day-card {
+            padding: 20px;
+        }
+
+        .day-title {
+            font-size: 22px;
+        }
+
+        .navigation {
+            flex-direction: column;
+        }
+
+        button {
+            width: 100%;
+        }
+    }
 </style>
 </head>
 <body>
 
 <div id="loginContainer">
-    <h2>Kirjaudu sisään</h2>
-    <input type="email" id="email" placeholder="Sähköposti"><br><br>
-    <input type="password" id="password" placeholder="Salasana"><br><br>
+    <h2>✨ Reflection Diary</h2>
+    <input type="email" id="email" placeholder="Sähköposti">
+    <input type="password" id="password" placeholder="Salasana">
     <button id="registerBtn">Rekisteröidy</button>
     <button id="loginBtn">Kirjaudu sisään</button>
 </div>
 
 <div id="diaryContainer" style="display:none;">
-    <h2 id="weekNumber"></h2>
+    <div class="diary-header">
+        <h1>📖 Reflection Diary 2026</h1>
+        <div id="weekNumber"></div>
+    </div>
+    
     <div id="weekContainer"></div>
-    <button onclick="prevWeek()">Edellinen viikko</button>
-    <button onclick="nextWeek()">Seuraava viikko</button>
-    <button onclick="logout()">Kirjaudu ulos</button>
+    
+    <div class="navigation">
+        <button class="nav-button" onclick="prevWeek()">← Edellinen viikko</button>
+        <button class="nav-button" onclick="nextWeek()">Seuraava viikko →</button>
+    </div>
+    
+    <div class="navigation">
+        <button class="logout-button" onclick="logout()">Kirjaudu ulos</button>
+    </div>
 </div>
 
 <script type="module">
@@ -54,7 +278,7 @@ const db = getFirestore();
 
 const year = 2026;
 let currentWeek = 1;
-const days = ["Ma", "Ti", "Ke", "To", "Pe", "La", "Su"];
+const days = ["Maanantai", "Tiistai", "Keskiviikko", "Torstai", "Perjantai", "Lauantai", "Sunnuntai"];
 
 // --- Koko vuoden kysymykset (Tammikuu + Helmikuu esimerkki) ---
 const questionsByMonth = {
@@ -97,7 +321,7 @@ document.getElementById("loginBtn").addEventListener("click", async () => {
     } catch(e) { alert(e.message); }
 });
 
-function logout() { signOut(auth); }
+window.logout = function() { signOut(auth); }
 
 onAuthStateChanged(auth, (user) => {
     if(user) {
@@ -135,10 +359,7 @@ async function generateWeek(weekNumber, uid) {
     const weekEnd = new Date(weekStart);
     weekEnd.setDate(weekStart.getDate() + 6);
 
-    weekNumberDiv.innerText =
-        "Viikko " + weekNumber + " – " +
-        formatDate(weekStart) + " – " +
-        formatDate(weekEnd);
+    weekNumberDiv.innerText = "Viikko " + weekNumber;
 
     container.innerHTML = "";
 
@@ -166,7 +387,7 @@ async function generateWeek(weekNumber, uid) {
         const card = document.createElement("div");
         card.className = "day-card";
         card.innerHTML = `
-            <div class="day-title">${days[i]} ${formatDate(date)}</div>
+            <div class="day-title">${days[i]}</div>
             <div class="question">${question}</div>
             <textarea rows="4" placeholder="Kirjoita ajatuksesi tähän...">${savedText}</textarea>
         `;
@@ -181,8 +402,19 @@ async function generateWeek(weekNumber, uid) {
     }
 }
 
-function nextWeek(){ if(currentWeek<53){ currentWeek++; generateWeek(currentWeek, auth.currentUser.uid); }}
-function prevWeek(){ if(currentWeek>1){ currentWeek--; generateWeek(currentWeek, auth.currentUser.uid); }}
+window.nextWeek = function(){ 
+    if(currentWeek<53){ 
+        currentWeek++; 
+        generateWeek(currentWeek, auth.currentUser.uid); 
+    }
+}
+
+window.prevWeek = function(){ 
+    if(currentWeek>1){ 
+        currentWeek--; 
+        generateWeek(currentWeek, auth.currentUser.uid); 
+    }
+}
 
 </script>
 </body>
