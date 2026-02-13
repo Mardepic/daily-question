@@ -4,9 +4,11 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Kysymys sinulle</title>
+
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Nunito:ital,wght@1,400&display=swap" rel="stylesheet">
+
 <style>
 *{margin:0;padding:0;box-sizing:border-box}
 body{font-family:Georgia,serif;background:linear-gradient(135deg,#f5f7fa 0%,#c3cfe2 100%);min-height:100vh;padding:20px;color:#2c3e50}
@@ -51,6 +53,7 @@ button{width:100%}
 }
 </style>
 </head>
+
 <body>
 
 <div id="loginContainer">
@@ -70,163 +73,17 @@ button{width:100%}
     <div id="weekContainer"></div>
     
     <div class="navigation">
-        <button class="nav-button" onclick="prevWeek()">← Edellinen viikko</button>
-        <button class="nav-button" onclick="nextWeek()">Seuraava viikko →</button>
+        <button class="nav-button" id="prevWeekBtn">← Edellinen viikko</button>
+        <button class="nav-button" id="nextWeekBtn">Seuraava viikko →</button>
     </div>
     
     <div class="navigation">
-        <button class="logout-button" onclick="logout()">Kirjaudu ulos</button>
+        <button class="logout-button" id="logoutBtn">Kirjaudu ulos</button>
     </div>
 </div>
 
-<script src="questions.js"></script>
-<script type="module">
-import { initializeApp } from "https://www.gstatic.com/firebasejs/12.9.0/firebase-app.js";
-import { getAuth, signInWithEmailAndPassword, createUserWithEmailAndPassword, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/12.9.0/firebase-auth.js";
-import { getFirestore, doc, setDoc, getDoc } from "https://www.gstatic.com/firebasejs/12.9.0/firebase-firestore.js";
+<!-- Ladataan koko sovellus tästä -->
+<script type="module" src="./js/app.js"></script>
 
-// --- Firebase Config ---
-const firebaseConfig = {
-    apiKey: "AIzaSyCJR7kIaO5R6b-mDigcaBUZbIv4lZhPd3g",
-    authDomain: "reflection-diary-2026-d9b75.firebaseapp.com",
-    projectId: "reflection-diary-2026-d9b75",
-    storageBucket: "reflection-diary-2026-d9b75.firebasestorage.app",
-    messagingSenderId: "40162654025",
-    appId: "1:40162654025:web:49d152a55fced628f78c98",
-    measurementId: "G-3RFHJPQV5Q"
-};
-
-const app = initializeApp(firebaseConfig);
-const auth = getAuth();
-const db = getFirestore();
-
-const year = 2026;
-let currentWeek = 1;
-const days = ["Maanantai", "Tiistai", "Keskiviikko", "Torstai", "Perjantai", "Lauantai", "Sunnuntai"];
-
-// Funktio joka palauttaa kysymyksen päivän numeron perusteella (1-365)
-function getQuestion(dayOfYear) {
-    return QUESTIONS[dayOfYear] || "Mitä ajattelet tänään?";
-}
-
-// --- Autentikointi ---
-document.getElementById("registerBtn").addEventListener("click", async () => {
-    const email = document.getElementById("email").value;
-    const password = document.getElementById("password").value;
-    try {
-        await createUserWithEmailAndPassword(auth, email, password);
-        alert("Rekisteröityminen onnistui!");
-    } catch(e) { alert(e.message); }
-});
-
-document.getElementById("loginBtn").addEventListener("click", async () => {
-    const email = document.getElementById("email").value;
-    const password = document.getElementById("password").value;
-    try {
-        await signInWithEmailAndPassword(auth, email, password);
-    } catch(e) { alert(e.message); }
-});
-
-window.logout = function() { signOut(auth); }
-
-onAuthStateChanged(auth, (user) => {
-    if(user) {
-        document.getElementById("loginContainer").style.display = "none";
-        document.getElementById("diaryContainer").style.display = "block";
-        generateWeek(currentWeek, user.uid);
-    } else {
-        document.getElementById("loginContainer").style.display = "block";
-        document.getElementById("diaryContainer").style.display = "none";
-    }
-});
-
-// --- Päivämäärä- ja viikkofunktiot ---
-function getDateOfISOWeek(week, year) {
-    const simple = new Date(year, 0, 1 + (week - 1) * 7);
-    const dow = simple.getDay();
-    const ISOweekStart = simple;
-    if (dow <= 4)
-        ISOweekStart.setDate(simple.getDate() - simple.getDay() + 1);
-    else
-        ISOweekStart.setDate(simple.getDate() + 8 - simple.getDay());
-    return ISOweekStart;
-}
-
-function getDayOfYear(date) {
-    const start = new Date(date.getFullYear(), 0, 0);
-    const diff = date - start;
-    const oneDay = 1000 * 60 * 60 * 24;
-    return Math.floor(diff / oneDay);
-}
-
-// --- Viikon generointi ---
-async function generateWeek(weekNumber, uid) {
-    const container = document.getElementById("weekContainer");
-    const weekNumberDiv = document.getElementById("weekNumber");
-
-    const weekStart = getDateOfISOWeek(weekNumber, year);
-
-    weekNumberDiv.innerText = "Viikko " + weekNumber;
-
-    container.innerHTML = "";
-
-    // Debounce funktio tallennukselle
-    let saveTimers = {};
-    
-    for(let i=0; i<7; i++) {
-        const date = new Date(weekStart);
-        date.setDate(weekStart.getDate() + i);
-
-        const dayOfYear = getDayOfYear(date);
-        const question = getQuestion(dayOfYear);
-        const key = year + "-" + date.toISOString().split("T")[0];
-
-        // Hae tallennettu vastaus Firestoresta
-        const docRef = doc(db, "diaries", uid + "_" + key);
-        let savedText = "";
-        try {
-            const docSnap = await getDoc(docRef);
-            if(docSnap.exists()) savedText = docSnap.data().answer || "";
-        } catch(e){ console.log(e); }
-
-        const card = document.createElement("div");
-        card.className = "day-card";
-        card.innerHTML = `
-            <div class="day-title">${days[i]}</div>
-            <div class="question">${question}</div>
-            <textarea rows="4" placeholder="Kirjoita ajatuksesi tähän...">${savedText}</textarea>
-        `;
-        
-        const textarea = card.querySelector("textarea");
-        
-        // Debounced save - odottaa 1 sekuntin ennen tallennusta
-        textarea.addEventListener("input", () => {
-            clearTimeout(saveTimers[key]);
-            saveTimers[key] = setTimeout(async () => {
-                try {
-                    await setDoc(doc(db, "diaries", uid + "_" + key), { answer: textarea.value });
-                } catch(e){ console.log(e); }
-            }, 1000);
-        });
-
-        container.appendChild(card);
-    }
-}
-
-window.nextWeek = function(){ 
-    if(currentWeek<53){ 
-        currentWeek++; 
-        generateWeek(currentWeek, auth.currentUser.uid); 
-    }
-}
-
-window.prevWeek = function(){ 
-    if(currentWeek>1){ 
-        currentWeek--; 
-        generateWeek(currentWeek, auth.currentUser.uid); 
-    }
-}
-
-</script>
 </body>
 </html>
