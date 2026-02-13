@@ -1,51 +1,47 @@
 <!DOCTYPE html>
 <html lang="fi">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Reflection Diary 2026</title>
-  <style>
-    body { font-family: Arial, sans-serif; background: #fdf6f0; color: #333; margin: 0; padding: 0; }
-    header { text-align: center; padding: 1rem; background: #6b4226; color: white; }
-    h1 { margin: 0; font-size: 1.8rem; }
-    .container { max-width: 800px; margin: 2rem auto; padding: 1rem; }
-    input, button, textarea { width: 100%; padding: 0.5rem; margin: 0.3rem 0; border-radius: 5px; box-sizing: border-box; }
-    button { background: #6b4226; color: white; border: none; cursor: pointer; }
-    button:hover { background: #5a361e; }
-    .day-card { background: #fff1e6; padding: 0.5rem; margin: 0.5rem 0; border-radius: 5px; }
-    .day-title { font-weight: bold; margin-bottom: 0.3rem; }
-    .question { font-style: italic; margin-bottom: 0.3rem; }
-    #weekControls { display:flex; justify-content: space-between; margin:1rem 0; }
-  </style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Reflection Diary 2026</title>
+<style>
+  body { font-family: Arial, sans-serif; background: #fdf6f0; color: #333; margin:0; padding:0; }
+  header { text-align:center; padding:1rem; background:#6b4226; color:white; }
+  h1{margin:0; font-size:1.8rem;}
+  .container{max-width:800px; margin:2rem auto; padding:1rem;}
+  input, button, textarea{width:100%; padding:0.5rem; margin:0.3rem 0; border-radius:5px; box-sizing:border-box;}
+  button{background:#6b4226; color:white; border:none; cursor:pointer;}
+  button:hover{background:#5a361e;}
+  .day-card{background:#fff1e6; padding:0.5rem; margin:0.5rem 0; border-radius:5px;}
+  .day-title{font-weight:bold; margin-bottom:0.3rem;}
+  .question{font-style:italic; margin-bottom:0.3rem;}
+  #weekControls{display:flex; justify-content:space-between; margin:1rem 0;}
+</style>
 </head>
 <body>
 
-<header>
-  <h1>Reflection Diary 2026</h1>
-</header>
+<header><h1>Reflection Diary 2026</h1></header>
 
 <div class="container">
 
-  <!-- Login Section -->
-  <div id="loginSection">
-    <input type="email" id="email" placeholder="Sähköposti">
-    <input type="password" id="password" placeholder="Salasana">
-    <button id="loginBtn">Kirjaudu sisään</button>
-    <button id="registerBtn">Rekisteröidy</button>
-    <p id="loginStatus"></p>
-  </div>
+<!-- Login Section -->
+<div id="loginSection">
+  <input type="email" id="email" placeholder="Sähköposti">
+  <input type="password" id="password" placeholder="Salasana">
+  <button id="loginBtn">Kirjaudu sisään</button>
+  <button id="registerBtn">Rekisteröidy</button>
+  <p id="loginStatus"></p>
+</div>
 
-  <!-- Diary Section -->
-  <div id="diarySection" style="display:none;">
-    <div id="weekControls">
-      <button id="prevWeekBtn">⬅ Edellinen viikko</button>
-      <div id="weekNumber" style="font-weight:bold"></div>
-      <button id="nextWeekBtn">Seuraava viikko ➡</button>
-    </div>
-    <div id="weekContainer"></div>
-    <button id="logoutBtn">Kirjaudu ulos</button>
+<!-- Diary Section -->
+<div id="diarySection" style="display:none;">
+  <div id="weekControls">
+    <button id="prevWeekBtn">⬅ Edellinen viikko</button>
+    <div id="weekNumber" style="font-weight:bold"></div>
+    <button id="nextWeekBtn">Seuraava viikko ➡</button>
   </div>
-
+  <div id="weekContainer"></div>
+  <button id="logoutBtn">Kirjaudu ulos</button>
 </div>
 
 <script type="module">
@@ -88,7 +84,9 @@ const year = 2026;
 let currentWeek = 1;
 const days = ["Ma","Ti","Ke","To","Pe","La","Su"];
 
-// --- YEAR QUESTIONS (esimerkki) ---
+// --- FULL YEAR QUESTIONS (Tammikuu–Joulukuu) ---
+// Tämä on esimerkkimuoto, voit kopioida kaikki kysymykset listalta 360+.
+// Tässä vain tammikuu/helmikuu näkyy lyhyesti, loput lisätään samalla tyylillä.
 const yearData = {
   "1":[
     "Mikä saa sinut tuntemaan itsesi eläväksi?",
@@ -97,7 +95,8 @@ const yearData = {
     "Mistä asiasta olet viimeksi muuttanut mielipidettäsi?",
     "Mikä lapsuusmuistosi on kirkkain?",
     "Millaista rakkautta haluat elämääsi?",
-    "Mikä pelko estää sinua tällä hetkellä?"
+    "Mikä pelko estää sinua tällä hetkellä?",
+    // lisää loput tammikuun kysymykset...
   ],
   "2":[
     "Kenelle haluaisit soittaa juuri nyt?",
@@ -106,9 +105,11 @@ const yearData = {
     "Keneltä kaipaat anteeksiantoa?",
     "Millainen ystävä olet?",
     "Mikä on suurin väärinymmärryksesi ihmissuhteissasi?",
-    "Kenelle haluaisit sanoa 'rakastan sinua'?"
+    "Kenelle haluaisit sanoa 'rakastan sinua'?",
+    // lisää loput helmikuun kysymykset...
   ],
-  // Lisää muut kuukaudet samalla logiikalla 3–12
+  "3":[],"4":[],"5":[],"6":[],"7":[],"8":[],"9":[],"10":[],"11":[],"12":[]
+  // Lisää kaikki kuukaudet 3–12 omilla kysymyksillä
 };
 
 // --- Helper Functions ---
@@ -123,24 +124,23 @@ function getISOWeek(date) {
 function getDateOfISOWeek(week, year) {
   const simple = new Date(year,0,1 + (week-1)*7);
   const dow = simple.getDay();
-  const ISOweekStart = simple;
+  const ISOweekStart = new Date(simple);
   if(dow<=4) ISOweekStart.setDate(simple.getDate() - simple.getDay() +1);
   else ISOweekStart.setDate(simple.getDate() +8 - simple.getDay());
   return ISOweekStart;
 }
 
-function formatDate(date) {
-  return date.getDate() + "." + (date.getMonth()+1) + "." + date.getFullYear();
+function formatDate(date){
+  return date.getDate()+"."+ (date.getMonth()+1) +"."+date.getFullYear();
 }
 
-// --- Get Question for Day (7 per week) ---
-function getQuestionForDate(date, dayIndex){
+function getQuestionForDate(date){
   const monthIndex = date.getMonth()+1;
-  const monthQuestions = yearData[monthIndex];
-  return monthQuestions[dayIndex % monthQuestions.length];
+  const monthQuestions = yearData[monthIndex] || [];
+  const dayOfMonth = date.getDate() - 1;
+  return monthQuestions[dayOfMonth] || "Ei kysymystä tälle päivälle";
 }
 
-// --- Generate Week ---
 async function generateWeek(weekNumber){
   weekContainer.innerHTML="";
   const weekStart = getDateOfISOWeek(weekNumber,year);
@@ -151,37 +151,28 @@ async function generateWeek(weekNumber){
   for(let i=0;i<7;i++){
     const date = new Date(weekStart);
     date.setDate(weekStart.getDate()+i);
-    const dayIndex = i; // 0=Ma,1=Ti,...
-    const question = getQuestionForDate(date,dayIndex);
+    const question = getQuestionForDate(date);
     const key = year+"-"+date.toISOString().split("T")[0];
 
-    let savedText="";
-    try{
-      const docRef = doc(db,"users",currentUser.uid,"weeks",key);
-      const docSnap = await getDoc(docRef);
-      if(docSnap.exists()) savedText = docSnap.data().answer || "";
-    }catch(e){ console.error(e); }
-
-    const card=document.createElement("div");
+    const card = document.createElement("div");
     card.className="day-card";
-
-    const textarea=document.createElement("textarea");
+    const textarea = document.createElement("textarea");
     textarea.rows=4;
     textarea.placeholder="Kirjoita ajatuksesi tähän...";
-    textarea.value=savedText;
 
-    textarea.addEventListener("change",async()=>{
-      try{
-        await setDoc(doc(db,"users",currentUser.uid,"weeks",key),{
-          answer: textarea.value,
-          question: question,
-          date: date.toISOString()
-        });
-      }catch(e){ console.error(e); }
+    getDoc(doc(db,"users",currentUser.uid,"weeks",key))
+      .then(docSnap => { if(docSnap.exists()) textarea.value = docSnap.data().answer || ""; });
+
+    textarea.addEventListener("change", async ()=>{
+      await setDoc(doc(db,"users",currentUser.uid,"weeks",key),{
+        answer: textarea.value,
+        question: question,
+        date: date.toISOString()
+      });
     });
 
     card.innerHTML=`<div class="day-title">${days[i]} ${formatDate(date)}</div>
-    <div class="question">${question}</div>`;
+                    <div class="question">${question}</div>`;
     card.appendChild(textarea);
     weekContainer.appendChild(card);
   }
@@ -194,22 +185,22 @@ nextWeekBtn.addEventListener("click",()=>nextWeek());
 prevWeekBtn.addEventListener("click",()=>prevWeek());
 
 // --- Firebase Auth ---
-registerBtn.addEventListener("click",async()=>{
-  const email=emailInput.value.trim();
-  const password=passwordInput.value.trim();
+registerBtn.addEventListener("click", async ()=>{
+  const email = emailInput.value.trim();
+  const password = passwordInput.value.trim();
   if(!email||!password){loginStatus.textContent="Täytä sähköposti ja salasana!"; return;}
   try{ await createUserWithEmailAndPassword(auth,email,password); loginStatus.textContent="Rekisteröinti onnistui!"; }
   catch(e){ loginStatus.textContent="Virhe: "+e.message; }
 });
 
-loginBtn.addEventListener("click",async()=>{
-  const email=emailInput.value.trim();
-  const password=passwordInput.value.trim();
+loginBtn.addEventListener("click", async ()=>{
+  const email = emailInput.value.trim();
+  const password = passwordInput.value.trim();
   try{ await signInWithEmailAndPassword(auth,email,password); }
   catch(e){ loginStatus.textContent="Virhe: "+e.message; }
 });
 
-logoutBtn.addEventListener("click",async()=>{ await signOut(auth); });
+logoutBtn.addEventListener("click", async ()=>{ await signOut(auth); });
 
 onAuthStateChanged(auth,user=>{
   if(user){ currentUser=user; loginSection.style.display="none"; diarySection.style.display="block"; generateWeek(currentWeek);}
