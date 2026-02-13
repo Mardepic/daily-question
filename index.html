@@ -3,39 +3,34 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Reflection Diary 2026</title>
+<title>Päiväkirja 2026</title>
 <style>
-body { font-family: Arial, sans-serif; padding:20px; max-width:800px; margin:auto; }
-.day-card { border:1px solid #ccc; border-radius:10px; padding:10px; margin-bottom:10px; background:#f9f9f9; }
-.day-title { font-weight:bold; margin-bottom:5px; }
-.question { margin-bottom:5px; }
-button { margin:5px; padding:5px 10px; }
+body { font-family: Arial, sans-serif; padding: 20px; background: #f4f4f4; }
+h1 { text-align: center; }
+.week-nav { text-align: center; margin: 20px 0; }
+button { margin: 0 10px; padding: 8px 16px; }
+.day-card { background: white; padding: 15px; margin-bottom: 15px; border-radius: 10px; box-shadow: 0 2px 5px rgba(0,0,0,0.1); }
+.day-title { font-weight: bold; margin-bottom: 5px; }
+.question { margin-bottom: 10px; font-style: italic; }
+textarea { width: 100%; border-radius: 10px; padding: 8px; resize: vertical; }
 </style>
 </head>
 <body>
 
-<h1>Reflection Diary 2026</h1>
-<div id="authSection">
-    <input type="email" id="email" placeholder="Sähköposti">
-    <input type="password" id="password" placeholder="Salasana">
-    <button id="registerBtn">Rekisteröidy</button>
-    <button id="loginBtn">Kirjaudu</button>
-    <div id="authMsg"></div>
+<h1>Päiväkirja 2026</h1>
+<div class="week-nav">
+    <button onclick="prevWeek()">← Edellinen viikko</button>
+    <span id="weekNumber">Viikko 1</span>
+    <button onclick="nextWeek()">Seuraava viikko →</button>
 </div>
+<div id="weekContainer"></div>
 
-<div id="diarySection" style="display:none;">
-    <h2 id="weekNumber"></h2>
-    <button onclick="prevWeek()">◀ Edellinen viikko</button>
-    <button onclick="nextWeek()">Seuraava viikko ▶</button>
-    <div id="weekContainer"></div>
-    <button onclick="logout()">Kirjaudu ulos</button>
-</div>
-
+<!-- Firebase SDK -->
 <script type="module">
 import { initializeApp } from "https://www.gstatic.com/firebasejs/12.9.0/firebase-app.js";
 import { getAnalytics } from "https://www.gstatic.com/firebasejs/12.9.0/firebase-analytics.js";
-import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/12.9.0/firebase-auth.js";
-import { getFirestore, doc, getDoc, setDoc } from "https://www.gstatic.com/firebasejs/12.9.0/firebase-firestore.js";
+import { getAuth, onAuthStateChanged, signInWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/12.9.0/firebase-auth.js";
+import { getFirestore, doc, setDoc, getDoc } from "https://www.gstatic.com/firebasejs/12.9.0/firebase-firestore.js";
 
 // Firebase config
 const firebaseConfig = {
@@ -48,134 +43,36 @@ const firebaseConfig = {
     measurementId: "G-3RFHJPQV5Q"
 };
 
+// Initialize Firebase
 const app = initializeApp(firebaseConfig);
 const analytics = getAnalytics(app);
-const auth = getAuth();
-const db = getFirestore();
+const auth = getAuth(app);
+const db = getFirestore(app);
 
+// -------------------- USER AUTH --------------------
 let currentUser = null;
 
+// Simple login for demo; you can expand with registration
+const email = prompt("Anna sähköpostisi (demo login):");
+const password = prompt("Anna salasana:");
+
+signInWithEmailAndPassword(auth, email, password)
+.then(userCredential => { 
+    currentUser = userCredential.user; 
+    generateWeek(currentWeek); 
+})
+.catch(err => alert("Kirjautuminen epäonnistui: " + err.message));
+
+// -------------------- CALENDAR LOGIC --------------------
 const year = 2026;
 let currentWeek = 1;
 const days = ["Ma","Ti","Ke","To","Pe","La","Su"];
 
-// --- YEAR DATA ---
-// Tässä on sinun koko kysymyslista kuukausittain. Esimerkki Tammikuu, voit lisätä kaikki kuukaudet kuten listaasi:
-const yearData = {
-    "Tammikuu": [
-        "Mikä saa sinut tuntemaan itsesi eläväksi?",
-        "Millainen haluaisit olla kymmenen vuoden päästä?",
-        "Mikä on paras neuvo, jonka olet koskaan saanut?",
-        "Mistä asiasta olet viimeksi muuttanut mielipidettäsi?",
-        "Mikä lapsuusmuistosi on kirkkain?",
-        "Millaista rakkautta haluat elämääsi?",
-        "Mikä pelko estää sinua tällä hetkellä?",
-        "Kenelle olet kiitollinen ja miksi?",
-        "Mikä on suurin saavutuksesi tähän mennessä?",
-        "Millainen on täydellinen päiväsi?",
-        "Mitä haluaisit oppia tänä vuonna?",
-        "Mikä asia sinussa on muuttunut viimeisen vuoden aikana?",
-        "Milloin viimeksi teit jotain ensimmäistä kertaa?",
-        "Mikä on tärkein arvosi?",
-        "Keneltä haluaisit pyytää anteeksi?",
-        "Mikä unelma tuntuu mahdottomalta?",
-        "Millaisissa tilanteissa olet parhaimmillasi?",
-        "Mitä sinulle merkitsee menestys?",
-        "Mikä ominaisuutesi on vahvuutesi?",
-        "Mistä luovut helposti ja mistä et?",
-        "Millainen ympäristö saa sinut voimaan hyvin?",
-        "Mikä musiikkikappale kuvaa tämänhetkistä elämääsi?",
-        "Keneen olet viimeksi ihailevasti suhtautunut?",
-        "Mikä tekee sinusta uniikin?",
-        "Millaista ystävyyttä haluat vaalia?",
-        "Mikä asia elämässäsi kaipaa muutosta?",
-        "Milloin olet viimeksi nauranut kunnolla?",
-        "Mitä haluat sanoa itsellesi viiden vuoden päästä?",
-        "Mikä on suurin haaveesi?",
-        "Mistä haluaisit päästää irti?",
-        "Mikä sinussa on pysynyt samana lapsesta asti?"
-    ],
-    "Helmikuu": [
-        "Kenelle haluaisit soittaa juuri nyt?",
-        "Mikä on tärkein opetuksesi rakkaudesta?",
-        "Miten osoitat välittämistäsi?",
-        "Keneltä kaipaat anteeksiantoa?",
-        "Millainen ystävä olet?",
-        "Mikä on suurin väärinymmärryksesi ihmissuhteissasi?",
-        "Kenelle haluaisit sanoa 'rakastan sinua'?",
-        "Mikä tekee suhteesta hyvän?",
-        "Miten käsittelet konflikteja?",
-        "Keneen luotat ehdoitta?",
-        "Millaista tukea tarvitset muilta?",
-        "Mikä on paras yhteinen muistosi jonkun kanssa?",
-        "Miten haluat tulla muistetuksi?",
-        "Kenelle olet tärkein?",
-        "Mikä on viimeisin merkityksellinen keskustelusi?",
-        "Miten voisit olla parempi kumppani?",
-        "Mikä tekee ihmisestä kiinnostavan?",
-        "Keneltä olet oppinut eniten elämästä?",
-        "Millaista rakkautta annat itsellesi?",
-        "Mikä on sinulle tärkeää perheessä?",
-        "Miten haluat vaikuttaa muihin ihmisiin?",
-        "Kenelle haluaisit kirjoittaa kirjeen?",
-        "Mikä on suurin uhrauksesi jonkun puolesta?",
-        "Miten hoidat ystävyyssuhteita?",
-        "Mikä tekee sinusta hyvän kuuntelijan?",
-        "Keneen haluaisit olla paremmin yhteydessä?",
-        "Millaista yhteyttä kaipaat?",
-        "Mikä on paras komplimentti, jonka olet saanut?"
-    ],
-    // Lisää kaikki muut kuukaudet samoin...
-};
-
-// --- AUTENTIKOINTI ---
-const authMsg = document.getElementById("authMsg");
-document.getElementById("registerBtn").addEventListener("click", () => {
-    const email = document.getElementById("email").value;
-    const password = document.getElementById("password").value;
-    createUserWithEmailAndPassword(auth, email, password)
-        .then(userCredential => { currentUser = userCredential.user; showDiary(); })
-        .catch(err => authMsg.innerText = err.message);
-});
-document.getElementById("loginBtn").addEventListener("click", () => {
-    const email = document.getElementById("email").value;
-    const password = document.getElementById("password").value;
-    signInWithEmailAndPassword(auth, email, password)
-        .then(userCredential => { currentUser = userCredential.user; showDiary(); })
-        .catch(err => authMsg.innerText = err.message);
-});
-
-function logout() {
-    signOut(auth).then(() => {
-        currentUser = null;
-        document.getElementById("diarySection").style.display = "none";
-        document.getElementById("authSection").style.display = "block";
-    });
-}
-
-onAuthStateChanged(auth, user => {
-    if(user) { currentUser = user; showDiary(); }
-});
-
-function showDiary() {
-    document.getElementById("authSection").style.display = "none";
-    document.getElementById("diarySection").style.display = "block";
-    generateWeek(currentWeek);
-}
-
-// --- PÄIVÄKORTIT ---
-function getISOWeek(date) {
-    const temp = new Date(date.valueOf());
-    const dayNum = (date.getDay() + 6) % 7;
-    temp.setDate(temp.getDate() - dayNum + 3);
-    const firstThursday = new Date(temp.getFullYear(),0,4);
-    return 1 + Math.round((temp - firstThursday) / 604800000);
-}
-
+// ISO week helpers
 function getDateOfISOWeek(week, year) {
-    const simple = new Date(year,0,1 + (week-1)*7);
+    const simple = new Date(year, 0, 1 + (week - 1) * 7);
     const dow = simple.getDay();
-    const ISOweekStart = new Date(simple);
+    const ISOweekStart = simple;
     if(dow <= 4) ISOweekStart.setDate(simple.getDate() - simple.getDay() + 1);
     else ISOweekStart.setDate(simple.getDate() + 8 - simple.getDay());
     return ISOweekStart;
@@ -185,7 +82,55 @@ function formatDate(date) {
     return date.getDate() + "." + (date.getMonth()+1) + "." + date.getFullYear();
 }
 
-async function generateWeek(weekNumber) {
+// -------------------- YEAR DATA --------------------
+const yearData = {
+  "Tammikuu": [
+    "Mikä saa sinut tuntemaan itsesi eläväksi?",
+    "Millainen haluaisit olla kymmenen vuoden päästä?",
+    "Mikä on paras neuvo, jonka olet koskaan saanut?",
+    "Mistä asiasta olet viimeksi muuttanut mielipidettäsi?",
+    "Mikä lapsuusmuistosi on kirkkain?",
+    "Millaista rakkautta haluat elämääsi?",
+    "Mikä pelko estää sinua tällä hetkellä?",
+    "Kenelle olet kiitollinen ja miksi?",
+    "Mikä on suurin saavutuksesi tähän mennessä?",
+    "Millainen on täydellinen päiväsi?",
+    "Mitä haluaisit oppia tänä vuonna?",
+    "Mikä asia sinussa on muuttunut viimeisen vuoden aikana?",
+    "Milloin viimeksi teit jotain ensimmäistä kertaa?",
+    "Mikä on tärkein arvosi?",
+    "Keneltä haluaisit pyytää anteeksi?",
+    "Mikä unelma tuntuu mahdottomalta?",
+    "Millaisissa tilanteissa olet parhaimmillasi?",
+    "Mitä sinulle merkitsee menestys?",
+    "Mikä ominaisuutesi on vahvuutesi?",
+    "Mistä luovut helposti ja mistä et?",
+    "Millainen ympäristö saa sinut voimaan hyvin?",
+    "Mikä musiikkikappale kuvaa tämänhetkistä elämääsi?",
+    "Keneen olet viimeksi ihailevasti suhtautunut?",
+    "Mikä tekee sinusta uniikin?",
+    "Millaista ystävyyttä haluat vaalia?",
+    "Mikä asia elämässäsi kaipaa muutosta?",
+    "Milloin olet viimeksi nauranut kunnolla?",
+    "Mitä haluat sanoa itsellesi viiden vuoden päästä?",
+    "Mikä on suurin haaveesi?",
+    "Mistä haluaisit päästää irti?",
+    "Mikä sinussa on pysynyt samana lapsesta asti?"
+  ],
+  // Lisää helmikuu–joulukuu samalla tavalla (voit liittää kaikki kysymykset)
+};
+
+// -------------------- WEEK GENERATION --------------------
+function getQuestionForDate(date) {
+    const monthIndex = date.getMonth();
+    const monthNames = Object.keys(yearData);
+    const monthQuestions = yearData[monthNames[monthIndex]];
+    // Käytetään modulo niin ei mene yli
+    return monthQuestions[(date.getDate() - 1) % monthQuestions.length];
+}
+
+function generateWeek(weekNumber) {
+    if(!currentUser) return; // odotetaan kirjautumista
     const container = document.getElementById("weekContainer");
     const weekNumberDiv = document.getElementById("weekNumber");
 
@@ -193,36 +138,33 @@ async function generateWeek(weekNumber) {
     const weekEnd = new Date(weekStart);
     weekEnd.setDate(weekStart.getDate() + 6);
 
-    weekNumberDiv.innerText =
-        "Viikko " + weekNumber + " – " +
-        formatDate(weekStart) + " – " +
-        formatDate(weekEnd);
+    weekNumberDiv.innerText = "Viikko " + weekNumber + " – " +
+        formatDate(weekStart) + " – " + formatDate(weekEnd);
 
     container.innerHTML = "";
 
     for(let i=0;i<7;i++){
         const date = new Date(weekStart);
         date.setDate(weekStart.getDate() + i);
-
         const question = getQuestionForDate(date);
         const key = year + "-" + date.toISOString().split("T")[0];
-
-        // Hae Firestoresta käyttäjän vastaus
-        const docRef = doc(db, "diary", currentUser.uid + "_" + key);
-        let savedText = "";
-        const docSnap = await getDoc(docRef);
-        if(docSnap.exists()) savedText = docSnap.data().answer;
 
         const card = document.createElement("div");
         card.className = "day-card";
         card.innerHTML = `
             <div class="day-title">${days[i]} ${formatDate(date)}</div>
             <div class="question">${question}</div>
-            <textarea rows="4" placeholder="Kirjoita ajatuksesi tähän..." style="width:100%; margin-top:10px; border-radius:10px; padding:8px;">${savedText}</textarea>
+            <textarea rows="4" placeholder="Kirjoita ajatuksesi tähän..." style="width:100%; margin-top:10px; border-radius:10px; padding:8px;"></textarea>
         `;
 
-        // Tallenna Firestoreen muutoksessa
         const textarea = card.querySelector("textarea");
+
+        // Lataa vastaus Firestoresta, jos olemassa
+        getDoc(doc(db, "diary", currentUser.uid + "_" + key)).then(docSnap=>{
+            if(docSnap.exists()) textarea.value = docSnap.data().answer;
+        });
+
+        // Tallenna Firestoreen muutoksessa
         textarea.addEventListener("change", async () => {
             await setDoc(doc(db, "diary", currentUser.uid + "_" + key), { answer: textarea.value });
         });
@@ -231,16 +173,11 @@ async function generateWeek(weekNumber) {
     }
 }
 
-function getQuestionForDate(date){
-    const monthNames = Object.keys(yearData);
-    const monthIndex = date.getMonth();
-    const monthQuestions = yearData[monthNames[monthIndex]] || [];
-    return monthQuestions[(date.getDate()-1) % monthQuestions.length] || "Ei kysymystä";
-}
-
+// -------------------- WEEK NAVIGATION --------------------
 function nextWeek(){ if(currentWeek<53){ currentWeek++; generateWeek(currentWeek); } }
 function prevWeek(){ if(currentWeek>1){ currentWeek--; generateWeek(currentWeek); } }
 
 </script>
+
 </body>
 </html>
