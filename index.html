@@ -4,230 +4,51 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Kysymys sinulle</title>
-<link href="https://fonts.googleapis.com/css2?family=Nunito:ital,wght@0,400;0,600;1,400&display=swap" rel="stylesheet">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Nunito:ital,wght@1,400&display=swap" rel="stylesheet">
 <style>
-    * {
-        margin: 0;
-        padding: 0;
-        box-sizing: border-box;
-    }
-
-    body { 
-        font-family: 'Georgia', serif;
-        background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
-        min-height: 100vh;
-        padding: 20px;
-        color: #2c3e50;
-    }
-
-    #loginContainer {
-        max-width: 400px;
-        margin: 100px auto;
-        background: white;
-        padding: 40px;
-        border-radius: 20px;
-        box-shadow: 0 10px 40px rgba(0,0,0,0.1);
-    }
-
-    #loginContainer h2 {
-        text-align: center;
-        margin-bottom: 30px;
-        color: #34495e;
-        font-size: 28px;
-    }
-
-    #loginContainer input {
-        width: 100%;
-        padding: 12px;
-        margin-bottom: 15px;
-        border: 2px solid #e0e0e0;
-        border-radius: 10px;
-        font-size: 16px;
-        transition: border-color 0.3s;
-    }
-
-    #loginContainer input:focus {
-        outline: none;
-        border-color: #3498db;
-    }
-
-    #diaryContainer {
-        max-width: 1200px;
-        margin: 0 auto;
-    }
-
-    .diary-header {
-        text-align: center;
-        margin-bottom: 40px;
-        background: white;
-        padding: 30px;
-        border-radius: 20px;
-        box-shadow: 0 5px 20px rgba(0,0,0,0.08);
-    }
-
-    .diary-header h1 {
-        font-size: 36px;
-        color: #2c3e50;
-        margin-bottom: 10px;
-        font-weight: 400;
-        letter-spacing: 1px;
-    }
-
-    #weekNumber {
-        font-size: 20px;
-        color: #7f8c8d;
-        font-weight: 300;
-    }
-
-    #weekContainer {
-        display: grid;
-        grid-template-columns: 1fr;
-        gap: 20px;
-        margin-bottom: 30px;
-    }
-
-    .day-card {
-        background: white;
-        padding: 30px;
-        border-radius: 15px;
-        box-shadow: 0 5px 15px rgba(0,0,0,0.08);
-        transition: transform 0.2s, box-shadow 0.2s;
-        border-left: 5px solid #3498db;
-    }
-
-    .day-card:hover {
-        transform: translateY(-3px);
-        box-shadow: 0 8px 25px rgba(0,0,0,0.12);
-    }
-
-    .day-card:nth-child(1) { border-left-color: #e74c3c; }
-    .day-card:nth-child(2) { border-left-color: #f39c12; }
-    .day-card:nth-child(3) { border-left-color: #f1c40f; }
-    .day-card:nth-child(4) { border-left-color: #2ecc71; }
-    .day-card:nth-child(5) { border-left-color: #3498db; }
-    .day-card:nth-child(6) { border-left-color: #9b59b6; }
-    .day-card:nth-child(7) { border-left-color: #e91e63; }
-
-    .day-title {
-        font-size: 28px;
-        font-weight: 600;
-        color: #2c3e50;
-        margin-bottom: 20px;
-        padding-bottom: 15px;
-        border-bottom: 2px solid #ecf0f1;
-    }
-
-    .question {
-        font-family: 'Nunito', sans-serif;
-        font-size: 18px;
-        color: #34495e;
-        margin-bottom: 20px;
-        font-style: italic;
-        line-height: 1.6;
-        padding: 15px;
-        background: #f8f9fa;
-        border-radius: 10px;
-        border-left: 3px solid #3498db;
-    }
-
-    textarea {
-        width: 100%;
-        padding: 15px;
-        border: 2px solid #e0e0e0;
-        border-radius: 10px;
-        font-family: 'Georgia', serif;
-        font-size: 16px;
-        line-height: 1.8;
-        resize: vertical;
-        min-height: 120px;
-        transition: border-color 0.3s;
-    }
-
-    textarea:focus {
-        outline: none;
-        border-color: #3498db;
-        background: #fafbfc;
-    }
-
-    .navigation {
-        display: flex;
-        justify-content: center;
-        gap: 15px;
-        margin-bottom: 20px;
-    }
-
-    button {
-        padding: 12px 25px;
-        border: none;
-        border-radius: 10px;
-        font-size: 16px;
-        cursor: pointer;
-        transition: all 0.3s;
-        font-family: 'Arial', sans-serif;
-        font-weight: 500;
-    }
-
-    button:hover {
-        transform: translateY(-2px);
-        box-shadow: 0 5px 15px rgba(0,0,0,0.2);
-    }
-
-    #loginContainer button {
-        width: 100%;
-        background: #3498db;
-        color: white;
-        margin-top: 10px;
-    }
-
-    #loginContainer button:hover {
-        background: #2980b9;
-    }
-
-    .nav-button {
-        background: #3498db;
-        color: white;
-    }
-
-    .nav-button:hover {
-        background: #2980b9;
-    }
-
-    .nav-button:disabled {
-        background: #95a5a6;
-        cursor: not-allowed;
-        transform: none;
-    }
-
-    .logout-button {
-        background: #e74c3c;
-        color: white;
-    }
-
-    .logout-button:hover {
-        background: #c0392b;
-    }
-
-    @media (max-width: 768px) {
-        .diary-header h1 {
-            font-size: 28px;
-        }
-
-        .day-card {
-            padding: 20px;
-        }
-
-        .day-title {
-            font-size: 22px;
-        }
-
-        .navigation {
-            flex-direction: column;
-        }
-
-        button {
-            width: 100%;
-        }
-    }
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:Georgia,serif;background:linear-gradient(135deg,#f5f7fa 0%,#c3cfe2 100%);min-height:100vh;padding:20px;color:#2c3e50}
+#loginContainer{max-width:400px;margin:100px auto;background:#fff;padding:40px;border-radius:20px;box-shadow:0 10px 40px rgba(0,0,0,.1)}
+#loginContainer h2{text-align:center;margin-bottom:30px;color:#34495e;font-size:28px}
+#loginContainer input{width:100%;padding:12px;margin-bottom:15px;border:2px solid #e0e0e0;border-radius:10px;font-size:16px;transition:border-color .3s}
+#loginContainer input:focus{outline:0;border-color:#3498db}
+#diaryContainer{max-width:1200px;margin:0 auto}
+.diary-header{text-align:center;margin-bottom:40px;background:#fff;padding:30px;border-radius:20px;box-shadow:0 5px 20px rgba(0,0,0,.08)}
+.diary-header h1{font-size:36px;color:#2c3e50;margin-bottom:10px;font-weight:400;letter-spacing:1px}
+#weekNumber{font-size:20px;color:#7f8c8d;font-weight:300}
+#weekContainer{display:grid;grid-template-columns:1fr;gap:20px;margin-bottom:30px}
+.day-card{background:#fff;padding:30px;border-radius:15px;box-shadow:0 5px 15px rgba(0,0,0,.08);transition:transform .2s,box-shadow .2s;border-left:5px solid #3498db}
+.day-card:hover{transform:translateY(-3px);box-shadow:0 8px 25px rgba(0,0,0,.12)}
+.day-card:nth-child(1){border-left-color:#e74c3c}
+.day-card:nth-child(2){border-left-color:#f39c12}
+.day-card:nth-child(3){border-left-color:#f1c40f}
+.day-card:nth-child(4){border-left-color:#2ecc71}
+.day-card:nth-child(5){border-left-color:#3498db}
+.day-card:nth-child(6){border-left-color:#9b59b6}
+.day-card:nth-child(7){border-left-color:#e91e63}
+.day-title{font-size:28px;font-weight:600;color:#2c3e50;margin-bottom:20px;padding-bottom:15px;border-bottom:2px solid #ecf0f1}
+.question{font-family:Nunito,sans-serif;font-size:18px;color:#34495e;margin-bottom:20px;font-style:italic;line-height:1.6;padding:15px;background:#f8f9fa;border-radius:10px;border-left:3px solid #3498db}
+textarea{width:100%;padding:15px;border:2px solid #e0e0e0;border-radius:10px;font-family:Georgia,serif;font-size:16px;line-height:1.8;resize:vertical;min-height:120px;transition:border-color .3s}
+textarea:focus{outline:0;border-color:#3498db;background:#fafbfc}
+.navigation{display:flex;justify-content:center;gap:15px;margin-bottom:20px}
+button{padding:12px 25px;border:0;border-radius:10px;font-size:16px;cursor:pointer;transition:all .3s;font-family:Arial,sans-serif;font-weight:500}
+button:hover{transform:translateY(-2px);box-shadow:0 5px 15px rgba(0,0,0,.2)}
+#loginContainer button{width:100%;background:#3498db;color:#fff;margin-top:10px}
+#loginContainer button:hover{background:#2980b9}
+.nav-button{background:#3498db;color:#fff}
+.nav-button:hover{background:#2980b9}
+.nav-button:disabled{background:#95a5a6;cursor:not-allowed;transform:none}
+.logout-button{background:#e74c3c;color:#fff}
+.logout-button:hover{background:#c0392b}
+@media (max-width:768px){
+.diary-header h1{font-size:28px}
+.day-card{padding:20px}
+.day-title{font-size:22px}
+.navigation{flex-direction:column}
+button{width:100%}
+}
 </style>
 </head>
 <body>
@@ -351,16 +172,15 @@ async function generateWeek(weekNumber, uid) {
 
     container.innerHTML = "";
 
+    // Debounce funktio tallennukselle
+    let saveTimers = {};
+    
     for(let i=0; i<7; i++) {
         const date = new Date(weekStart);
         date.setDate(weekStart.getDate() + i);
 
-        // Laske päivän numero vuodessa (1-365)
         const dayOfYear = getDayOfYear(date);
-        
-        // Hae kysymys
         const question = getQuestion(dayOfYear);
-
         const key = year + "-" + date.toISOString().split("T")[0];
 
         // Hae tallennettu vastaus Firestoresta
@@ -378,11 +198,17 @@ async function generateWeek(weekNumber, uid) {
             <div class="question">${question}</div>
             <textarea rows="4" placeholder="Kirjoita ajatuksesi tähän...">${savedText}</textarea>
         `;
+        
         const textarea = card.querySelector("textarea");
-        textarea.addEventListener("change", async () => {
-            try {
-                await setDoc(doc(db, "diaries", uid + "_" + key), { answer: textarea.value });
-            } catch(e){ console.log(e); }
+        
+        // Debounced save - odottaa 1 sekuntin ennen tallennusta
+        textarea.addEventListener("input", () => {
+            clearTimeout(saveTimers[key]);
+            saveTimers[key] = setTimeout(async () => {
+                try {
+                    await setDoc(doc(db, "diaries", uid + "_" + key), { answer: textarea.value });
+                } catch(e){ console.log(e); }
+            }, 1000);
         });
 
         container.appendChild(card);
