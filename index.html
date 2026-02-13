@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Reflection Diary - Vuoden muistio</title>
+  <title>Reflection Diary 2026</title>
   <style>
     body { font-family: Arial, sans-serif; background: #fdf6f0; color: #333; margin: 0; padding: 0; }
     header { text-align: center; padding: 1rem; background: #6b4226; color: white; }
@@ -20,194 +20,202 @@
 </head>
 <body>
 
-  <header>
-    <h1>Reflection Diary 2026</h1>
-  </header>
+<header>
+  <h1>Reflection Diary 2026</h1>
+</header>
 
-  <div class="container">
+<div class="container">
 
-    <!-- Login Section -->
-    <div id="loginSection">
-      <input type="email" id="email" placeholder="Sähköposti">
-      <input type="password" id="password" placeholder="Salasana">
-      <button id="loginBtn">Kirjaudu sisään</button>
-      <button id="registerBtn">Rekisteröidy</button>
-      <p id="loginStatus"></p>
-    </div>
-
-    <!-- Diary Section -->
-    <div id="diarySection" style="display:none;">
-      <div id="weekControls">
-        <button id="prevWeekBtn">⬅ Edellinen viikko</button>
-        <div id="weekNumber" style="font-weight:bold"></div>
-        <button id="nextWeekBtn">Seuraava viikko ➡</button>
-      </div>
-      <div id="weekContainer"></div>
-      <button id="logoutBtn">Kirjaudu ulos</button>
-    </div>
-
+  <!-- Login Section -->
+  <div id="loginSection">
+    <input type="email" id="email" placeholder="Sähköposti">
+    <input type="password" id="password" placeholder="Salasana">
+    <button id="loginBtn">Kirjaudu sisään</button>
+    <button id="registerBtn">Rekisteröidy</button>
+    <p id="loginStatus"></p>
   </div>
 
-  <script type="module">
-    import { initializeApp } from "https://www.gstatic.com/firebasejs/12.9.0/firebase-app.js";
-    import { getAnalytics } from "https://www.gstatic.com/firebasejs/12.9.0/firebase-analytics.js";
-    import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/12.9.0/firebase-auth.js";
-    import { getFirestore, doc, setDoc, getDoc } from "https://www.gstatic.com/firebasejs/12.9.0/firebase-firestore.js";
+  <!-- Diary Section -->
+  <div id="diarySection" style="display:none;">
+    <div id="weekControls">
+      <button id="prevWeekBtn">⬅ Edellinen viikko</button>
+      <div id="weekNumber" style="font-weight:bold"></div>
+      <button id="nextWeekBtn">Seuraava viikko ➡</button>
+    </div>
+    <div id="weekContainer"></div>
+    <button id="logoutBtn">Kirjaudu ulos</button>
+  </div>
 
-    const firebaseConfig = {
-      apiKey: "AIzaSyCJR7kIaO5R6b-mDigcaBUZbIv4lZhPd3g",
-      authDomain: "reflection-diary-2026-d9b75.firebaseapp.com",
-      projectId: "reflection-diary-2026-d9b75",
-      storageBucket: "reflection-diary-2026-d9b75.firebasestorage.app",
-      messagingSenderId: "40162654025",
-      appId: "1:40162654025:web:49d152a55fced628f78c98",
-      measurementId: "G-3RFHJPQV5Q"
-    };
+</div>
 
-    const app = initializeApp(firebaseConfig);
-    const analytics = getAnalytics(app);
-    const auth = getAuth(app);
-    const db = getFirestore(app);
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/12.9.0/firebase-app.js";
+import { getAnalytics } from "https://www.gstatic.com/firebasejs/12.9.0/firebase-analytics.js";
+import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/12.9.0/firebase-auth.js";
+import { getFirestore, doc, setDoc, getDoc } from "https://www.gstatic.com/firebasejs/12.9.0/firebase-firestore.js";
 
-    const loginSection = document.getElementById("loginSection");
-    const diarySection = document.getElementById("diarySection");
-    const emailInput = document.getElementById("email");
-    const passwordInput = document.getElementById("password");
-    const loginBtn = document.getElementById("loginBtn");
-    const registerBtn = document.getElementById("registerBtn");
-    const logoutBtn = document.getElementById("logoutBtn");
-    const loginStatus = document.getElementById("loginStatus");
-    const weekContainer = document.getElementById("weekContainer");
-    const weekNumberDiv = document.getElementById("weekNumber");
-    const prevWeekBtn = document.getElementById("prevWeekBtn");
-    const nextWeekBtn = document.getElementById("nextWeekBtn");
+// --- Firebase Config ---
+const firebaseConfig = {
+  apiKey: "AIzaSyCJR7kIaO5R6b-mDigcaBUZbIv4lZhPd3g",
+  authDomain: "reflection-diary-2026-d9b75.firebaseapp.com",
+  projectId: "reflection-diary-2026-d9b75",
+  storageBucket: "reflection-diary-2026-d9b75.firebasestorage.app",
+  messagingSenderId: "40162654025",
+  appId: "1:40162654025:web:49d152a55fced628f78c98",
+  measurementId: "G-3RFHJPQV5Q"
+};
 
-    let currentUser = null;
-    const year = 2026;
-    let currentWeek = 1;
-    const days = ["Ma","Ti","Ke","To","Pe","La","Su"];
+const app = initializeApp(firebaseConfig);
+const analytics = getAnalytics(app);
+const auth = getAuth(app);
+const db = getFirestore(app);
 
-    // --- YEAR DATA --- koko vuoden kysymykset (esimerkki)
-    const yearData = {
-      "1": Array(31).fill("Mikä oli tämän päivän paras hetki?"),
-      "2": Array(28).fill("Mikä sai sinut tänään hymyilemään?"),
-      "3": Array(31).fill("Mitä opit tänään?"),
-      "4": Array(30).fill("Mikä oli suurin haaste tänään?"),
-      "5": Array(31).fill("Mikä sai sinut kiitolliseksi?"),
-      "6": Array(30).fill("Mitä haluat parantaa huomenna?"),
-      "7": Array(31).fill("Mikä teki sinusta ylpeän tänään?"),
-      "8": Array(31).fill("Mikä oli päivän opetus?"),
-      "9": Array(30).fill("Mitä haluat muistaa tästä päivästä?"),
-      "10": Array(31).fill("Mitä sait valmiiksi tänään?"),
-      "11": Array(30).fill("Mikä teki päivästä merkityksellisen?"),
-      "12": Array(31).fill("Mikä oli päivän ilo?")
-    };
+const loginSection = document.getElementById("loginSection");
+const diarySection = document.getElementById("diarySection");
+const emailInput = document.getElementById("email");
+const passwordInput = document.getElementById("password");
+const loginBtn = document.getElementById("loginBtn");
+const registerBtn = document.getElementById("registerBtn");
+const logoutBtn = document.getElementById("logoutBtn");
+const loginStatus = document.getElementById("loginStatus");
+const weekContainer = document.getElementById("weekContainer");
+const weekNumberDiv = document.getElementById("weekNumber");
+const prevWeekBtn = document.getElementById("prevWeekBtn");
+const nextWeekBtn = document.getElementById("nextWeekBtn");
 
-    function getISOWeek(date) {
-      const temp = new Date(date.valueOf());
-      const dayNum = (date.getDay() + 6) % 7;
-      temp.setDate(temp.getDate() - dayNum + 3);
-      const firstThursday = new Date(temp.getFullYear(),0,4);
-      return 1 + Math.round((temp - firstThursday) / 604800000);
-    }
+let currentUser = null;
+const year = 2026;
+let currentWeek = 1;
+const days = ["Ma","Ti","Ke","To","Pe","La","Su"];
 
-    function getDateOfISOWeek(week, year) {
-      const simple = new Date(year, 0, 1 + (week - 1) * 7);
-      const dow = simple.getDay();
-      const ISOweekStart = simple;
-      if (dow <= 4)
-        ISOweekStart.setDate(simple.getDate() - simple.getDay() + 1);
-      else
-        ISOweekStart.setDate(simple.getDate() + 8 - simple.getDay());
-      return ISOweekStart;
-    }
+// --- YEAR QUESTIONS (esimerkki) ---
+const yearData = {
+  "1":[
+    "Mikä saa sinut tuntemaan itsesi eläväksi?",
+    "Millainen haluaisit olla kymmenen vuoden päästä?",
+    "Mikä on paras neuvo, jonka olet koskaan saanut?",
+    "Mistä asiasta olet viimeksi muuttanut mielipidettäsi?",
+    "Mikä lapsuusmuistosi on kirkkain?",
+    "Millaista rakkautta haluat elämääsi?",
+    "Mikä pelko estää sinua tällä hetkellä?"
+  ],
+  "2":[
+    "Kenelle haluaisit soittaa juuri nyt?",
+    "Mikä on tärkein opetuksesi rakkaudesta?",
+    "Miten osoitat välittämistäsi?",
+    "Keneltä kaipaat anteeksiantoa?",
+    "Millainen ystävä olet?",
+    "Mikä on suurin väärinymmärryksesi ihmissuhteissasi?",
+    "Kenelle haluaisit sanoa 'rakastan sinua'?"
+  ],
+  // Lisää muut kuukaudet samalla logiikalla 3–12
+};
 
-    function formatDate(date) {
-      return date.getDate() + "." + (date.getMonth()+1) + "." + date.getFullYear();
-    }
+// --- Helper Functions ---
+function getISOWeek(date) {
+  const temp = new Date(date.valueOf());
+  const dayNum = (date.getDay() + 6) % 7;
+  temp.setDate(temp.getDate() - dayNum + 3);
+  const firstThursday = new Date(temp.getFullYear(),0,4);
+  return 1 + Math.round((temp - firstThursday) / 604800000);
+}
 
-    function getQuestionForDate(date) {
-      const monthIndex = date.getMonth() + 1;
-      const monthQuestions = yearData[monthIndex];
-      return monthQuestions[(date.getDate()-1) % monthQuestions.length];
-    }
+function getDateOfISOWeek(week, year) {
+  const simple = new Date(year,0,1 + (week-1)*7);
+  const dow = simple.getDay();
+  const ISOweekStart = simple;
+  if(dow<=4) ISOweekStart.setDate(simple.getDate() - simple.getDay() +1);
+  else ISOweekStart.setDate(simple.getDate() +8 - simple.getDay());
+  return ISOweekStart;
+}
 
-    async function generateWeek(weekNumber) {
-      weekContainer.innerHTML = "";
-      const weekStart = getDateOfISOWeek(weekNumber, year);
-      const weekEnd = new Date(weekStart);
-      weekEnd.setDate(weekStart.getDate() + 6);
+function formatDate(date) {
+  return date.getDate() + "." + (date.getMonth()+1) + "." + date.getFullYear();
+}
 
-      weekNumberDiv.innerText = "Viikko " + weekNumber + " – " + formatDate(weekStart) + " – " + formatDate(weekEnd);
+// --- Get Question for Day (7 per week) ---
+function getQuestionForDate(date, dayIndex){
+  const monthIndex = date.getMonth()+1;
+  const monthQuestions = yearData[monthIndex];
+  return monthQuestions[dayIndex % monthQuestions.length];
+}
 
-      for (let i = 0; i < 7; i++) {
-        const date = new Date(weekStart);
-        date.setDate(weekStart.getDate() + i);
-        const question = getQuestionForDate(date);
+// --- Generate Week ---
+async function generateWeek(weekNumber){
+  weekContainer.innerHTML="";
+  const weekStart = getDateOfISOWeek(weekNumber,year);
+  const weekEnd = new Date(weekStart);
+  weekEnd.setDate(weekStart.getDate()+6);
+  weekNumberDiv.innerText="Viikko "+weekNumber+" – "+formatDate(weekStart)+" – "+formatDate(weekEnd);
 
-        const key = year + "-" + date.toISOString().split("T")[0];
-        let savedText = "";
+  for(let i=0;i<7;i++){
+    const date = new Date(weekStart);
+    date.setDate(weekStart.getDate()+i);
+    const dayIndex = i; // 0=Ma,1=Ti,...
+    const question = getQuestionForDate(date,dayIndex);
+    const key = year+"-"+date.toISOString().split("T")[0];
 
-        // Hae Firestoresta käyttäjäkohtainen vastaus
-        try {
-          const docRef = doc(db, "users", currentUser.uid, "weeks", key);
-          const docSnap = await getDoc(docRef);
-          if(docSnap.exists()) savedText = docSnap.data().answer || "";
-        } catch(e) { console.error(e); }
+    let savedText="";
+    try{
+      const docRef = doc(db,"users",currentUser.uid,"weeks",key);
+      const docSnap = await getDoc(docRef);
+      if(docSnap.exists()) savedText = docSnap.data().answer || "";
+    }catch(e){ console.error(e); }
 
-        const card = document.createElement("div");
-        card.className = "day-card";
+    const card=document.createElement("div");
+    card.className="day-card";
 
-        const textarea = document.createElement("textarea");
-        textarea.rows = 4;
-        textarea.placeholder = "Kirjoita ajatuksesi tähän...";
-        textarea.value = savedText;
+    const textarea=document.createElement("textarea");
+    textarea.rows=4;
+    textarea.placeholder="Kirjoita ajatuksesi tähän...";
+    textarea.value=savedText;
 
-        textarea.addEventListener("change", async () => {
-          try {
-            await setDoc(doc(db, "users", currentUser.uid, "weeks", key), {
-              answer: textarea.value,
-              question: question,
-              date: date.toISOString()
-            });
-          } catch(e) { console.error(e); }
+    textarea.addEventListener("change",async()=>{
+      try{
+        await setDoc(doc(db,"users",currentUser.uid,"weeks",key),{
+          answer: textarea.value,
+          question: question,
+          date: date.toISOString()
         });
-
-        card.innerHTML = `<div class="day-title">${days[i]} ${formatDate(date)}</div><div class="question">${question}</div>`;
-        card.appendChild(textarea);
-        weekContainer.appendChild(card);
-      }
-    }
-
-    function nextWeek() { if(currentWeek<53){currentWeek++; generateWeek(currentWeek);} }
-    function prevWeek() { if(currentWeek>1){currentWeek--; generateWeek(currentWeek);} }
-
-    nextWeekBtn.addEventListener("click", ()=>nextWeek());
-    prevWeekBtn.addEventListener("click", ()=>prevWeek());
-
-    // --- Firebase Auth ---
-    registerBtn.addEventListener("click", async () => {
-      const email = emailInput.value.trim();
-      const password = passwordInput.value.trim();
-      if(!email||!password){loginStatus.textContent="Täytä sähköposti ja salasana!"; return;}
-      try { await createUserWithEmailAndPassword(auth, email, password); loginStatus.textContent="Rekisteröinti onnistui!"; } 
-      catch(e){ loginStatus.textContent = "Virhe: "+e.message; }
+      }catch(e){ console.error(e); }
     });
 
-    loginBtn.addEventListener("click", async () => {
-      const email = emailInput.value.trim();
-      const password = passwordInput.value.trim();
-      try { await signInWithEmailAndPassword(auth,email,password); } 
-      catch(e){ loginStatus.textContent = "Virhe: "+e.message; }
-    });
+    card.innerHTML=`<div class="day-title">${days[i]} ${formatDate(date)}</div>
+    <div class="question">${question}</div>`;
+    card.appendChild(textarea);
+    weekContainer.appendChild(card);
+  }
+}
 
-    logoutBtn.addEventListener("click", async()=>{ await signOut(auth); });
+function nextWeek(){ if(currentWeek<53){currentWeek++; generateWeek(currentWeek);} }
+function prevWeek(){ if(currentWeek>1){currentWeek--; generateWeek(currentWeek);} }
 
-    onAuthStateChanged(auth, user => {
-      if(user){ currentUser=user; loginSection.style.display="none"; diarySection.style.display="block"; generateWeek(currentWeek);}
-      else{ currentUser=null; loginSection.style.display="block"; diarySection.style.display="none"; loginStatus.textContent=""; }
-    });
+nextWeekBtn.addEventListener("click",()=>nextWeek());
+prevWeekBtn.addEventListener("click",()=>prevWeek());
 
-  </script>
+// --- Firebase Auth ---
+registerBtn.addEventListener("click",async()=>{
+  const email=emailInput.value.trim();
+  const password=passwordInput.value.trim();
+  if(!email||!password){loginStatus.textContent="Täytä sähköposti ja salasana!"; return;}
+  try{ await createUserWithEmailAndPassword(auth,email,password); loginStatus.textContent="Rekisteröinti onnistui!"; }
+  catch(e){ loginStatus.textContent="Virhe: "+e.message; }
+});
+
+loginBtn.addEventListener("click",async()=>{
+  const email=emailInput.value.trim();
+  const password=passwordInput.value.trim();
+  try{ await signInWithEmailAndPassword(auth,email,password); }
+  catch(e){ loginStatus.textContent="Virhe: "+e.message; }
+});
+
+logoutBtn.addEventListener("click",async()=>{ await signOut(auth); });
+
+onAuthStateChanged(auth,user=>{
+  if(user){ currentUser=user; loginSection.style.display="none"; diarySection.style.display="block"; generateWeek(currentWeek);}
+  else{ currentUser=null; loginSection.style.display="block"; diarySection.style.display="none"; loginStatus.textContent=""; }
+});
+
+</script>
 </body>
 </html>
