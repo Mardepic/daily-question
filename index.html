@@ -1,136 +1,80 @@
 <!DOCTYPE html>
 <html lang="fi">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Vuoden Kysymykset</title>
-
-<link href="https://fonts.googleapis.com/css2?family=Patrick+Hand&display=swap" rel="stylesheet">
-
-<style>
-body {
-    margin: 0;
-    font-family: 'Patrick Hand', cursive;
-    background: #e7d3bd;
-    text-align: center;
-}
-
-h1 {
-    margin-top: 30px;
-    font-size: 46px;
-}
-
-.month-title {
-    font-size: 24px;
-    margin-bottom: 20px;
-}
-
-.container {
-    display: grid;
-    grid-template-columns: repeat(2, 1fr);
-    gap: 30px;
-    padding: 30px;
-    max-width: 1000px;
-    margin: auto;
-}
-
-.day-card {
-    background: #f4f4f4;
-    border-radius: 25px;
-    padding: 20px;
-    min-height: 160px;
-    box-shadow: 0 10px 25px rgba(0,0,0,0.08);
-}
-
-.day-title {
-    background: #d79c6e;
-    color: white;
-    padding: 6px 18px;
-    border-radius: 15px;
-    display: inline-block;
-    margin-bottom: 10px;
-}
-
-.question {
-    font-size: 18px;
-}
-
-@media(max-width: 700px) {
-    .container {
-        grid-template-columns: 1fr;
-    }
-}
-</style>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Reflection Diary - GitHub Pages</title>
+  <style>
+    body { font-family: Arial, sans-serif; margin: 2rem; }
+    input { padding: 0.5rem; width: 300px; }
+    button { padding: 0.5rem 1rem; margin-left: 0.5rem; }
+    ul { margin-top: 1rem; padding-left: 1.2rem; }
+    li { margin-bottom: 0.5rem; }
+  </style>
 </head>
 <body>
+  <h1>Reflection Diary</h1>
+  <p id="status">Yhdistetään Firebaseen...</p>
 
-<h1>Weekly Reflection</h1>
-<div class="month-title" id="monthTitle"></div>
-<div class="container" id="weekContainer"></div>
+  <input type="text" id="noteInput" placeholder="Kirjoita muistiinpano">
+  <button id="saveBtn">Tallenna muistiinpano</button>
 
-<script>
+  <h2>Muistiinpanot</h2>
+  <ul id="notesList"></ul>
 
-// 🔹 TÄHÄN LIITÄT KAIKKI KYSYMYKSESI
-const yearData = {
-    "Tammikuu – Uudet alut ja itsetuntemus": [
-        "Mikä saa sinut tuntemaan itsesi eläväksi?",
-        "Millainen haluaisit olla kymmenen vuoden päästä?",
-        "Mikä on paras neuvo, jonka olet koskaan saanut?"
-        // LIITÄ TÄHÄN kaikki tammikuun kysymykset
-    ],
-    "Helmikuu – Ihmissuhteet ja rakkaus": [
-        "Kenelle haluaisit soittaa juuri nyt?",
-        "Mikä on tärkein opetuksesi rakkaudesta?"
-        // jne...
-    ]
-    // Lisää kaikki muut kuukaudet samalla tavalla
-};
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/12.9.0/firebase-app.js";
+    import { getAnalytics } from "https://www.gstatic.com/firebasejs/12.9.0/firebase-analytics.js";
+    import { getFirestore, collection, addDoc, getDocs } from "https://www.gstatic.com/firebasejs/12.9.0/firebase-firestore.js";
 
-const days = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"];
+    // --- FIREBASE CONFIG --- 
+    const firebaseConfig = {
+      apiKey: "AIzaSyCJR7kIaO5R6b-mDigcaBUZbIv4lZhPd3g",
+      authDomain: "reflection-diary-2026-d9b75.firebaseapp.com",
+      projectId: "reflection-diary-2026-d9b75",
+      storageBucket: "reflection-diary-2026-d9b75.firebasestorage.app",
+      messagingSenderId: "40162654025",
+      appId: "1:40162654025:web:49d152a55fced628f78c98",
+      measurementId: "G-3RFHJPQV5Q"
+    };
 
-function getWeekDates() {
-    const today = new Date();
-    const first = today.getDate() - today.getDay() + 1;
-    return new Date(today.setDate(first));
-}
+    // Alustetaan Firebase ja Firestore
+    const app = initializeApp(firebaseConfig);
+    const analytics = getAnalytics(app);
+    const db = getFirestore(app);
 
-function generateWeek() {
-    const container = document.getElementById("weekContainer");
-    const monthTitle = document.getElementById("monthTitle");
+    document.getElementById("status").textContent = "Firebase ja Firestore yhdistetty!";
 
-    const today = new Date();
-    const monthIndex = today.getMonth();
-    const monthNames = Object.keys(yearData);
-    const currentMonthName = monthNames[monthIndex];
-    const monthQuestions = yearData[currentMonthName];
+    const notesList = document.getElementById("notesList");
+    const noteInput = document.getElementById("noteInput");
+    const saveBtn = document.getElementById("saveBtn");
 
-    monthTitle.innerText = currentMonthName;
+    // Lisää uusi muistiinpano
+    saveBtn.addEventListener("click", async () => {
+      const noteText = noteInput.value.trim();
+      if(noteText === "") return alert("Kirjoita jotain!");
+      try {
+        await addDoc(collection(db, "notes"), { text: noteText });
+        noteInput.value = "";
+        loadNotes();
+      } catch (error) {
+        console.error("Virhe muistiinpanoa lisättäessä:", error);
+      }
+    });
 
-    const weekStart = getWeekDates();
-    container.innerHTML = "";
-
-    for (let i = 0; i < 7; i++) {
-        const date = new Date(weekStart);
-        date.setDate(weekStart.getDate() + i);
-
-        const questionIndex = (date.getDate() - 1) % monthQuestions.length;
-        const question = monthQuestions[questionIndex];
-
-        const card = document.createElement("div");
-        card.className = "day-card";
-
-        card.innerHTML = `
-            <div class="day-title">${days[i]}</div>
-            <div class="question">${question}</div>
-        `;
-
-        container.appendChild(card);
+    // Hae ja näytä muistiinpanot
+    async function loadNotes() {
+      notesList.innerHTML = "";
+      const querySnapshot = await getDocs(collection(db, "notes"));
+      querySnapshot.forEach((doc) => {
+        const li = document.createElement("li");
+        li.textContent = doc.data().text;
+        notesList.appendChild(li);
+      });
     }
-}
 
-generateWeek();
-
-</script>
-
+    // Lataa muistiinpanot heti
+    loadNotes();
+  </script>
 </body>
 </html>
