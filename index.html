@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html lang="fi">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Vuoden Kysymykset</title>
+
+<link href="https://fonts.googleapis.com/css2?family=Patrick+Hand&display=swap" rel="stylesheet">
+
+<style>
+body {
+    margin: 0;
+    font-family: 'Patrick Hand', cursive;
+    background: #e7d3bd;
+    text-align: center;
+}
+
+h1 {
+    margin-top: 30px;
+    font-size: 46px;
+}
+
+.month-title {
+    font-size: 24px;
+    margin-bottom: 20px;
+}
+
+.container {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 30px;
+    padding: 30px;
+    max-width: 1000px;
+    margin: auto;
+}
+
+.day-card {
+    background: #f4f4f4;
+    border-radius: 25px;
+    padding: 20px;
+    min-height: 160px;
+    box-shadow: 0 10px 25px rgba(0,0,0,0.08);
+}
+
+.day-title {
+    background: #d79c6e;
+    color: white;
+    padding: 6px 18px;
+    border-radius: 15px;
+    display: inline-block;
+    margin-bottom: 10px;
+}
+
+.question {
+    font-size: 18px;
+}
+
+@media(max-width: 700px) {
+    .container {
+        grid-template-columns: 1fr;
+    }
+}
+</style>
+</head>
+<body>
+
+<h1>Weekly Reflection</h1>
+<div class="month-title" id="monthTitle"></div>
+<div class="container" id="weekContainer"></div>
+
+<script>
+
+// 🔹 TÄHÄN LIITÄT KAIKKI KYSYMYKSESI
+const yearData = {
+    "Tammikuu – Uudet alut ja itsetuntemus": [
+        "Mikä saa sinut tuntemaan itsesi eläväksi?",
+        "Millainen haluaisit olla kymmenen vuoden päästä?",
+        "Mikä on paras neuvo, jonka olet koskaan saanut?"
+        // LIITÄ TÄHÄN kaikki tammikuun kysymykset
+    ],
+    "Helmikuu – Ihmissuhteet ja rakkaus": [
+        "Kenelle haluaisit soittaa juuri nyt?",
+        "Mikä on tärkein opetuksesi rakkaudesta?"
+        // jne...
+    ]
+    // Lisää kaikki muut kuukaudet samalla tavalla
+};
+
+const days = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"];
+
+function getWeekDates() {
+    const today = new Date();
+    const first = today.getDate() - today.getDay() + 1;
+    return new Date(today.setDate(first));
+}
+
+function generateWeek() {
+    const container = document.getElementById("weekContainer");
+    const monthTitle = document.getElementById("monthTitle");
+
+    const today = new Date();
+    const monthIndex = today.getMonth();
+    const monthNames = Object.keys(yearData);
+    const currentMonthName = monthNames[monthIndex];
+    const monthQuestions = yearData[currentMonthName];
+
+    monthTitle.innerText = currentMonthName;
+
+    const weekStart = getWeekDates();
+    container.innerHTML = "";
+
+    for (let i = 0; i < 7; i++) {
+        const date = new Date(weekStart);
+        date.setDate(weekStart.getDate() + i);
+
+        const questionIndex = (date.getDate() - 1) % monthQuestions.length;
+        const question = monthQuestions[questionIndex];
+
+        const card = document.createElement("div");
+        card.className = "day-card";
+
+        card.innerHTML = `
+            <div class="day-title">${days[i]}</div>
+            <div class="question">${question}</div>
+        `;
+
+        container.appendChild(card);
+    }
+}
+
+generateWeek();
+
+</script>
+
+</body>
+</html>
