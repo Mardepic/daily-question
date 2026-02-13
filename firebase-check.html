@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="fi">
+<head>
+  <meta charset="UTF-8">
+  <title>Firebase-tarkistus</title>
+</head>
+<body>
+  <h1>Firebase Debug Tool</h1>
+  <div id="output"></div>
+
+  <script type="module">
+    import { app, auth, db } from "./js/firebase.js";
+
+    const output = document.getElementById("output");
+
+    function log(msg) {
+      console.log(msg);
+      const p = document.createElement("p");
+      p.textContent = msg;
+      output.appendChild(p);
+    }
+
+    try {
+      if (app && auth && db) {
+        log("✅ Firebase.js ladattu oikein!");
+        log("Auth object: " + JSON.stringify(auth, null, 2));
+        log("DB object: " + JSON.stringify(db, null, 2));
+
+        // Tarkistetaan config-arvot (vain yleiskatsaus)
+        const config = app.options;
+        log("firebaseConfig:");
+        Object.keys(config).forEach(key => {
+          log(`  ${key}: ${config[key]}`);
+        });
+
+        log("🔹 Vertaa yllä olevia arvoja Firebase Console → Project Settings → Your apps → Config");
+      } else {
+        log("❌ Firebase.js ei latautunut kunnolla.");
+      }
+    } catch (error) {
+      log("❌ Virhe Firebase-tarkistuksessa: " + error.message);
+    }
+  </script>
+</body>
+</html>
