@@ -1,9 +1,8 @@
 // js/firebase.js
-
 import { initializeApp } from "firebase/app";
-import { getAnalytics } from "firebase/analytics";
-import { getFirestore } from "firebase/firestore";
 import { getAuth } from "firebase/auth";
+import { getFirestore } from "firebase/firestore";
+import { getAnalytics } from "firebase/analytics";
 
 const firebaseConfig = {
   apiKey: "AIzaSyCJR7kIaO5R6b-mDigcaBUZbIv4lZhPd3g",
@@ -12,7 +11,7 @@ const firebaseConfig = {
   storageBucket: "reflection-diary-2026-d9b75.firebasestorage.app",
   messagingSenderId: "40162654025",
   appId: "1:40162654025:web:49d152a55fced628f78c98",
-  measurementId: "G-3RFHJPQV5Q" // valinnainen
+  measurementId: "G-3RFHJPQV5Q"
 };
 
 const app = initializeApp(firebaseConfig);
